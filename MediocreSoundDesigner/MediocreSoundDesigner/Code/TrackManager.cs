@@ -22,9 +22,14 @@ public class TrackManager {
 		Tracks.Add(track);
 	}
 
-	public void RemTrack(Track track) {
-		Tracks.Remove(track);
-	}
+    public void RemTrack(Track track)
+    {
+        Tracks.Remove(track);
+        if (SelectedTrack == track)
+        {
+            SelectedTrack = null;
+        }
+    }
 
 	public void SelectTrack(Track track) {
 		SelectedTrack = track;
