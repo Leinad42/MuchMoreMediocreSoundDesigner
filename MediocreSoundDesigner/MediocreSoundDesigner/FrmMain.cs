@@ -37,6 +37,39 @@ public partial class FrmMain : Form
     // GUI controls
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+        // keyboard shortcuts
+        //open file
+        if (keyData == (Keys.Control | Keys.O))
+        {
+            menuFileOpen_Click(this, EventArgs.Empty);
+            return true;
+        }
+        //save file
+        else if (keyData == (Keys.Control | Keys.S))
+        {
+            menuFileSave_Click(this, EventArgs.Empty);
+            return true;
+        }
+        //play/pause
+        else if (keyData == Keys.Space)
+        {
+            btnPlay_Click(this, EventArgs.Empty);
+            return true;
+        }
+        //reverse track
+        else if (keyData == (Keys.Control | Keys.R))
+        {
+            menuEditReverse_Click(this, EventArgs.Empty);
+            return true;
+        }
+        //flip track
+        else if (keyData == (Keys.Control | Keys.F))
+        {
+            menuEditFlip_Click(this, EventArgs.Empty);
+            return true;
+        }
+
+        //Exsisting keyboard controls
         if (trackManager.SelectedTrack is not null)
         {
             if (keyData == Keys.Left)
