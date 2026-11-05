@@ -92,6 +92,56 @@ public class Track : IDisposable {
       samples[i] *= -1;
     }
   }
+  // Fade in method
+  public void FadeIn(float durationSeconds){
+    if (durationSeconds <= 0 || sampleRate <= 0 || samples.Length == 0)
+      return;
+    
+    // Calculate how many audio frames the fade should cover
+    int totalFrames = samples.Length / channels;
+    int fadeFrames = Math.Min(totalFrames, (int)(durationSeconds * sampleRate));
+
+    if (fadeFrames <= 1)
+      return;
+
+    // Gradually increase volume from 0% to 100%
+    for (int frame = 0; frame < fadeFrames; frame++)
+    {
+      float multiplier = (float)frame / (fadeFrames - 1);
+
+      for (int channel = 0; channel < channels; channel++)
+      {
+        int index = frame * channels + channel;
+        samples[index] *= multiplier;
+      }
+    }
+  }
+  // Fade out method
+  public void FadeOut(float durationSeconds){
+    if (durationSeconds <= 0 || sampleRate <= 0 || samples.Length == 0)
+      return;
+    
+    int totalFrames = samples.Length / channels;
+    int fadeFrames = Math.Min(totalFrames, (int)(durationSeconds * sampleRate));
+
+    if (fadeFrames <= 1)
+      return;
+
+    // Start the fade near the end of the track
+    int startFrame = totalFrames - fadeFrames;
+
+    // Gradually decrease volume from 100% to 0%
+    for (int frame = 0; frame < fadeFrames; frame++)
+    {
+      float multiplier = 1.0f - (float)frame / (fadeFrames - 1);
+
+      for (int channel = 0; channel < channels; channel++)
+      {
+        int index = (startFrame + frame) * channels + channel;
+        samples[index] *= multiplier;
+      }
+    }
+  }
   public void Trim() {
   }
   public void AlterTimeScale(float scale) {
