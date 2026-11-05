@@ -323,6 +323,73 @@ public partial class FrmMain : Form
         lblPlayhead.BringToFront();
     }
 
+    private float? AskFadeDuration(string title)
+    {
+        using Form dialog = new Form
+        {
+            Text = title,
+            Width = 330,
+            Height = 180,
+            FormBorderStyle = FormBorderStyle.FixedDialog,
+            StartPosition = FormStartPosition.CenterParent,
+            MaximizeBox = false,
+            MinimizeBox = false
+        };
+
+        Label label = new Label
+        {
+            Text = "Fade duration (seconds):",
+            Left = 20,
+            Top = 20,
+            Width = 260
+        };
+
+        NumericUpDown durationInput = new NumericUpDown
+        {
+            Left = 20,
+            Top = 50,
+            Width = 260,
+            Minimum = 0.1m,
+            Maximum = 3600m,
+            DecimalPlaces = 1,
+            Increment = 0.5m,
+            Value = 3.0m
+        };
+
+        Button okButton = new Button
+        {
+            Text = "Apply",
+            Left = 110,
+            Top = 90,
+            Width = 80,
+            DialogResult = DialogResult.OK
+        };
+
+        Button cancelButton = new Button
+        {
+            Text = "Cancel",
+            Left = 200,
+            Top = 90,
+            Width = 80,
+            DialogResult = DialogResult.Cancel
+        };
+
+        dialog.Controls.Add(label);
+        dialog.Controls.Add(durationInput);
+        dialog.Controls.Add(okButton);
+        dialog.Controls.Add(cancelButton);
+
+        dialog.AcceptButton = okButton;
+        dialog.CancelButton = cancelButton;
+
+        if (dialog.ShowDialog(this) == DialogResult.OK)
+        {
+            return (float)durationInput.Value;
+        }
+
+        return null;
+    }
+
     private void trkVolume_Scroll(object sender, EventArgs e)
     {
         if (trackManager.SelectedTrack is null) return;
@@ -332,11 +399,56 @@ public partial class FrmMain : Form
 
     private void SyncVolumeSlider()
     {
+        // Do nothing if the volume slider hasn't been initialized
+        if (trkVolume is null)
+            return;
+
         Track t = trackManager.SelectedTrack;
         trkVolume.Enabled = t is not null;
         if (t is not null)
         {
             trkVolume.Value = Math.Clamp((int)Math.Round(t.Volume * 100f), trkVolume.Minimum, trkVolume.Maximum);
         }
+    }
+
+    private void menuEditFadeIn_Click(object sender, EventArgs e)
+    {
+        Track track = trackManager.SelectedTrack;
+
+        if (track is null)
+        {
+            MessageBox.Show("Please select a track first.");
+            return;
+        }
+
+        float? duration = AskFadeDuration("Fade In");
+
+        if (duration is null)
+            return;
+
+        track.FadeIn(duration.Value);
+
+        // Refresh the waveform after modifying the samples
+        track.PanDrawSamples.Invalidate();
+    }
+
+    private void menuEditFadeOut_Click(object sender, EventArgs e)
+    {
+        Track track = trackManager.SelectedTrack;
+
+        if (track is null)
+        {
+            MessageBox.Show("Please select a track first.");
+            return;
+        }
+
+        float? duration = AskFadeDuration("Fade Out");
+
+        if (duration is null)
+            return;
+
+        track.FadeOut(duration.Value);
+
+        track.PanDrawSamples.Invalidate();
     }
 }
