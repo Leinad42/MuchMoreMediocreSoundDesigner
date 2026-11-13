@@ -37,6 +37,7 @@ public partial class FrmMain : Form
     // GUI controls
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
+        
         // keyboard shortcuts
         //open file
         if (keyData == (Keys.Control | Keys.O))
@@ -45,6 +46,7 @@ public partial class FrmMain : Form
             return true;
         }
         //save file
+        if (trackManager.SelectedTrack is not null) { }
         else if (keyData == (Keys.Control | Keys.S))
         {
             menuFileSave_Click(this, EventArgs.Empty);
@@ -54,19 +56,23 @@ public partial class FrmMain : Form
         else if (keyData == Keys.Space)
         {
             btnPlay_Click(this, EventArgs.Empty);
+            
             return true;
         }
         //reverse track
         else if (keyData == (Keys.Control | Keys.R))
         {
             menuEditReverse_Click(this, EventArgs.Empty);
+            trackManager.SelectedTrack.PanDrawSamples.Invalidate();
             return true;
         }
         //flip track
         else if (keyData == (Keys.Control | Keys.F))
         {
             menuEditFlip_Click(this, EventArgs.Empty);
+            trackManager.SelectedTrack.PanDrawSamples.Invalidate();
             return true;
+
         }
 
         //Exsisting keyboard controls
@@ -450,5 +456,10 @@ public partial class FrmMain : Form
         track.FadeOut(duration.Value);
 
         track.PanDrawSamples.Invalidate();
+    }
+
+    private void panTracks_Paint(object sender, PaintEventArgs e)
+    {
+
     }
 }
